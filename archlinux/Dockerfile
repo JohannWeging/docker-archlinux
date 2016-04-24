@@ -2,7 +2,7 @@ FROM base/archlinux:latest
 MAINTAINER "Johann Weging <johann@weging.com>"
 
 ENV DUMB_INIT_VERSION 1.0.1
-ENV GOSU_VERSION 1.7
+ENV GOSU_VERSION 1.8
 
 RUN set -x \
 && curl -sSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_INIT_VERSION/dumb-init_${DUMB_INIT_VERSION}_amd64 > /usr/bin/dumb-init \

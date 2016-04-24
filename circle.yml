@@ -1,0 +1,26 @@
+---
+  machine:
+    services:
+      - docker
+
+  dependencies:
+    override:
+      - docker info
+      - docker version
+      - docker login -e="." -u="johannweging+baymax" -p="$DOCKER_PASS" quay.io
+      - mkdir images
+      - docker build -t build ./builder
+      - docker run -v $(pwd)/images:/images build bash /mkimage-arch.sh
+      - docker import images/archlinux.tar 
+      - docker build -t quay.io/johannweging/archlinux ./archlinux
+
+  test:
+    override:
+      - exit 0
+
+  deployment:
+    hub:
+      branch: master
+
+      commands:
+        - docker push quay.io/johannweging/archlinux
