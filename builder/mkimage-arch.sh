@@ -4,9 +4,12 @@
 # requires root
 set -x
 
-pacman -Sy
-pacman -S arch-install-scripts
-pacman -S expect
+pacman --noconfirm -Sy
+pacman --noconfirm -S archlinux-keyring
+pacman --noconfirm -Su
+pacman-db-upgrade 
+pacman --noconfirm -S arch-install-scripts
+pacman --noconfirm -S expect
 
 export LANG="C.UTF-8"
 
@@ -109,4 +112,4 @@ mknod -m 600 $DEV/initctl p
 mknod -m 666 $DEV/ptmx c 5 2
 ln -sf /proc/self/fd $DEV/fd
 
-tar --numeric-owner --xattrs --acls -C $ROOTFS -c . > /images/$DOCKER_IMAGE_NAME.tar 
+tar --numeric-owner --xattrs --acls -C $ROOTFS -c . > /images/$DOCKER_IMAGE_NAME.tar

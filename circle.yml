@@ -11,7 +11,7 @@
       - mkdir images
       - docker build -t build ./builder
       - docker run -v $(pwd)/images:/images build bash /mkimage-arch.sh
-      - docker import images/archlinux.tar 
+      - docker import images/archlinux.tar
       - docker build -t quay.io/johannweging/archlinux ./archlinux
 
   test:
