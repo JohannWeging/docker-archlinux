@@ -2,19 +2,22 @@
 # Generate a minimal filesystem for archlinux and load it into the local
 # docker as "archlinux"
 # requires root
-set -x
+set -e
 
-pacman --noconfirm -Syy
-pacman --noconfirm -S archlinux-keyring
-pacman --noconfirm -Su
-pacman-db-upgrade 
-pacman --noconfirm -Suy
-pacman --noconfirm -S arch-install-scripts
-pacman --noconfirm -S expect
+hash pacstrap &>/dev/null || {
+	echo "Could not find pacstrap. Run pacman -S arch-install-scripts"
+	exit 1
+}
+
+hash expect &>/dev/null || {
+	echo "Could not find expect. Run pacman -S expect"
+	exit 1
+}
+
 
 export LANG="C.UTF-8"
-
-ROOTFS=$(mktemp -d ${TMPDIR:-/var/tmp}/rootfs-archlinux-XXXXXXXXXX)
+ROOTFS=/rootfs
+mkdir -p $ROOTFS
 chmod 755 $ROOTFS
 
 # packages to ignore for space savings
@@ -80,6 +83,7 @@ expect <<EOF
 		exp_send -s -- \$arg
 	}
 	set timeout $EXPECT_TIMEOUT
+
 	spawn pacstrap -C $PACMAN_CONF -c -d -G -i $ROOTFS base haveged $PACMAN_EXTRA_PKGS --ignore $PKGIGNORE
 	expect {
 		-exact "anyway? \[Y/n\] " { send -- "n\r"; exp_continue }
@@ -93,7 +97,6 @@ arch-chroot $ROOTFS /bin/sh -c "haveged -w 1024; pacman-key --init; pkill havege
 arch-chroot $ROOTFS /bin/sh -c "ln -s /usr/share/zoneinfo/UTC /etc/localtime"
 echo 'en_US.UTF-8 UTF-8' > $ROOTFS/etc/locale.gen
 arch-chroot $ROOTFS locale-gen
-arch-chroot $ROOTFS /bin/sh -c 'echo $PACMAN_MIRRORLIST > /etc/pacman.d/mirrorlist'
 
 # udev doesn't work in containers, rebuild /dev
 DEV=$ROOTFS/dev
@@ -113,4 +116,4 @@ mknod -m 600 $DEV/initctl p
 mknod -m 666 $DEV/ptmx c 5 2
 ln -sf /proc/self/fd $DEV/fd
 
-tar --numeric-owner --xattrs --acls -C $ROOTFS -c . > /images/$DOCKER_IMAGE_NAME.tar
+tar --numeric-owner --xattrs --acls -cf /image/archlinux.tar -C $ROOTFS .

@@ -1,4 +1,4 @@
-FROM base/archlinux:latest
+FROM archlinux
 MAINTAINER "Johann Weging <johann@weging.com>"
 
 ENV DUMB_INIT_VERSION 1.0.1
