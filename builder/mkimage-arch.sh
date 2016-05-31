@@ -4,10 +4,11 @@
 # requires root
 set -x
 
-pacman --noconfirm -Sy
+pacman --noconfirm -Syy
 pacman --noconfirm -S archlinux-keyring
 pacman --noconfirm -Su
 pacman-db-upgrade 
+pacman --noconfirm -Suy
 pacman --noconfirm -S arch-install-scripts
 pacman --noconfirm -S expect
 
